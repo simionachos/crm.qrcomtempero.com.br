@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer base {
+  html, body {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  input, textarea, select {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+}
+
+/* Monochromatic Apple/Braun minimalist style for Leaflet tiles */
+.monochrome-map .leaflet-tile-pane {
+  filter: grayscale(100%) contrast(110%) brightness(98%);
+}
+
+/* Custom Leaflet popup styling for minimalist monochrome theme */
+.leaflet-popup-content-wrapper {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e5e5e5 !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}

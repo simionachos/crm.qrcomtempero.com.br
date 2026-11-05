@@ -1,0 +1,6 @@
+{
+  "name": "SDR Rota Prospecção SP",
+  "description": "Webapp de apoio para caminhada de prospecção comercial: rota otimizada, melhores horários, contatos-chave, dicas de metrô e registro rápido de visitas.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
