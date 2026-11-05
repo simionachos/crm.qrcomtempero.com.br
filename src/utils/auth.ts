@@ -31,14 +31,18 @@ export function clearStoredAuth(): void {
   }
 }
 
-export async function loginUser(email: string, password: string): Promise<{ success: boolean; message?: string; user?: AuthUser; token?: string }> {
+export async function loginUser(
+  email: string,
+  password: string,
+  durationDays: number = 30
+): Promise<{ success: boolean; message?: string; user?: AuthUser; token?: string }> {
   try {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, durationDays })
     });
 
     const data = await res.json();

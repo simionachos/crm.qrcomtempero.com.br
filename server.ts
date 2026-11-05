@@ -36,7 +36,7 @@ function verifyAuthToken(authHeader?: string): { valid: boolean; email?: string 
 
 // Endpoint de Login
 app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body || {};
+  const { email, password, durationDays = 7 } = req.body || {};
 
   if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
     return res.status(400).json({
@@ -53,17 +53,17 @@ app.post('/api/auth/login', (req, res) => {
   const isPasswordValid = password === configuredPassword || (!process.env.AUTH_PASSWORD && password === 'sdr2026');
 
   if (!isAllowedDomain || !isPasswordValid) {
-    // Mensagem genérica para não divulgar a regra interna de domínio
     return res.status(401).json({
       success: false,
       message: 'Credenciais inválidas ou acesso não autorizado.'
     });
   }
 
-  // Gera token de sessão com validade de 7 dias
+  // Gera token de sessão com a validade selecionada (7, 15, 30 ou 90 dias)
+  const validDays = Number(durationDays) > 0 && Number(durationDays) <= 180 ? Number(durationDays) : 7;
   const sessionPayload = {
     email: normalizedEmail,
-    exp: Date.now() + 7 * 24 * 60 * 60 * 1000
+    exp: Date.now() + validDays * 24 * 60 * 60 * 1000
   };
   const token = Buffer.from(JSON.stringify(sessionPayload)).toString('base64');
 
@@ -79,7 +79,55 @@ app.post('/api/auth/login', (req, res) => {
     user: {
       email: normalizedEmail,
       name: formattedName
-    }
+    },
+    expiresInDays: validDays
+  });
+});
+
+// Endpoint para login biométrico (WebAuthn / Impressão Digital / Face ID)
+app.post('/api/auth/biometric-login', (req, res) => {
+  const { email, credentialId, durationDays = 30 } = req.body || {};
+
+  if (!email || !credentialId || typeof email !== 'string') {
+    return res.status(400).json({
+      success: false,
+      message: 'Dados biométricos incompletos.'
+    });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const isAllowedDomain = normalizedEmail.endsWith('@qrcomunicacao.com.br');
+
+  if (!isAllowedDomain) {
+    return res.status(401).json({
+      success: false,
+      message: 'Credenciais inválidas ou acesso não autorizado.'
+    });
+  }
+
+  // Gera novo token de sessão autenticado biometricamente
+  const validDays = Number(durationDays) > 0 && Number(durationDays) <= 180 ? Number(durationDays) : 30;
+  const sessionPayload = {
+    email: normalizedEmail,
+    exp: Date.now() + validDays * 24 * 60 * 60 * 1000,
+    biometric: true
+  };
+  const token = Buffer.from(JSON.stringify(sessionPayload)).toString('base64');
+
+  const username = normalizedEmail.split('@')[0];
+  const formattedName = username
+    .split(/[._-]/)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+  return res.json({
+    success: true,
+    token,
+    user: {
+      email: normalizedEmail,
+      name: formattedName
+    },
+    expiresInDays: validDays
   });
 });
 

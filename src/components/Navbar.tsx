@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { RouteLead, VisitStatus } from '../types';
 import { AuthUser } from '../utils/auth';
-import { FileText, Footprints, LogOut, Sparkles } from 'lucide-react';
+import { FileText, Footprints, LogOut, Sparkles, Fingerprint } from 'lucide-react';
 
 interface NavbarProps {
   completedCount: number;
   totalCount: number;
   onOpenReport: () => void;
   onOpenAiCoach: () => void;
+  onOpenSecurity?: () => void;
   activeLeadId: number;
   routeLeads: RouteLead[];
   leadStatuses: Record<number, VisitStatus>;
@@ -21,6 +22,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   totalCount,
   onOpenReport,
   onOpenAiCoach,
+  onOpenSecurity,
   activeLeadId,
   routeLeads,
   leadStatuses,
@@ -82,6 +84,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               <FileText className="w-3.5 h-3.5" />
               <span>Resumo</span>
             </button>
+
+            {user && onOpenSecurity && (
+              <button
+                onClick={onOpenSecurity}
+                className="h-8 w-8 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-zinc-700 hover:text-black flex items-center justify-center transition active:scale-95"
+                title="Configurar Biometria e Sessão"
+              >
+                <Fingerprint className="w-4 h-4" />
+              </button>
+            )}
 
             {user && (
               <button

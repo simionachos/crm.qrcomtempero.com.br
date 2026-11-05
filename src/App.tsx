@@ -14,6 +14,7 @@ import { PitchModal } from './components/PitchModal';
 import { DailyReportModal } from './components/DailyReportModal';
 import { AIAssistantModal } from './components/AIAssistantModal';
 import { LoginView } from './components/LoginView';
+import { SecurityModal } from './components/SecurityModal';
 import { MapPin } from 'lucide-react';
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
   const [pitchLead, setPitchLead] = useState<RouteLead | null>(null);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [isSecurityOpen, setIsSecurityOpen] = useState(false);
   const [aiLeadContext, setAiLeadContext] = useState<RouteLead | undefined>(undefined);
 
   // Inicialização e verificação de autenticação
@@ -125,6 +127,7 @@ export default function App() {
         leadStatuses={leadStatuses}
         onSelectLead={handleSelectLead}
         user={currentUser}
+        onOpenSecurity={() => setIsSecurityOpen(true)}
         onLogout={handleLogout}
       />
 
@@ -245,6 +248,14 @@ export default function App() {
           lead={aiLeadContext}
           isOpen={isAiModalOpen}
           onClose={() => setIsAiModalOpen(false)}
+        />
+      )}
+
+      {currentUser && (
+        <SecurityModal
+          isOpen={isSecurityOpen}
+          onClose={() => setIsSecurityOpen(false)}
+          user={currentUser}
         />
       )}
     </div>
