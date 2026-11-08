@@ -139,7 +139,7 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[2000] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl border-2 border-black h-[92vh] max-h-[800px] flex flex-col overflow-hidden shadow-2xl">
+      <div className="bg-white w-full max-w-md sm:max-w-xl md:max-w-2xl rounded-t-3xl sm:rounded-3xl border-2 border-black h-[92vh] max-h-[820px] flex flex-col overflow-hidden shadow-2xl">
         {/* Header Monocromático */}
         <div className="p-3.5 border-b border-zinc-200 bg-black text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">

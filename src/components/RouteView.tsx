@@ -124,12 +124,96 @@ export const RouteView: React.FC<RouteViewProps> = ({
   // Google Maps pedestre saindo da Rua São Benedito, 1474 até o lead ativo
   const googleMapsWalkingUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(STARTING_POINT.address)}&destination=${encodeURIComponent(activeLead.address)}&travelmode=walking`;
 
+  const renderRouteStopsList = () => (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-500 px-1">
+        <span>ORDEM DESTE ROTEIRO ({leads.length} LOCAIS)</span>
+        <span>{currentModeConfig.shortName}</span>
+      </div>
+
+      <div className="divide-y divide-zinc-200 rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-xs lg:max-h-[calc(100vh-280px)] lg:overflow-y-auto">
+        {leads.map((lead) => {
+          const isSelected = lead.id === activeLead.id;
+          const status = leadStatuses[lead.id];
+          const isDone = status === 'scheduled' || status === 'visited' || status === 'in_progress';
+
+          return (
+            <div
+              key={lead.id}
+              onClick={() => onSelectLead(lead.id)}
+              className={`p-3.5 cursor-pointer transition flex items-center justify-between gap-3 active:bg-zinc-100 ${
+                isSelected ? 'bg-zinc-100 border-l-4 border-black' : 'hover:bg-zinc-50'
+              }`}
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div
+                  className={`w-7 h-7 rounded-lg text-xs font-mono font-bold flex items-center justify-center shrink-0 ${
+                    isDone
+                      ? 'bg-black text-white'
+                      : isSelected
+                      ? 'bg-black text-white ring-2 ring-zinc-400'
+                      : 'bg-zinc-100 text-zinc-700 border border-zinc-300'
+                  }`}
+                >
+                  {isDone ? '✓' : lead.order}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
+                    <h4 className="font-bold text-sm text-black truncate leading-tight">
+                      {lead.name}
+                    </h4>
+                    {lead.suggestedTimeSlot && (
+                      <span className="text-[10px] font-mono font-bold text-zinc-700 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200 shrink-0">
+                        {lead.suggestedTimeSlot}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-[11px] text-zinc-600 mt-0.5 truncate">
+                    <span>👤 {lead.targetContact}</span>
+                    <span>•</span>
+                    <span className="font-mono">{lead.walkingFromPrev.distance}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                <a
+                  href={getWhatsAppUrl(lead)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ backgroundColor: WHATSAPP_PALETTE.bubble, color: WHATSAPP_PALETTE.darkTeal }}
+                  className="p-1.5 rounded-lg border border-emerald-300/60 hover:opacity-90 transition active:scale-90 flex items-center justify-center shadow-2xs"
+                  title="Conversar no WhatsApp"
+                >
+                  <WhatsAppIcon size={14} fill={WHATSAPP_PALETTE.darkTeal} />
+                </a>
+                <button
+                  onClick={() => onOpenAiCoach(lead)}
+                  className="p-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-600 hover:text-black transition active:scale-90"
+                  title="Perguntar à IA OpenRouter"
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                </button>
+                <ChevronRight className={`w-4 h-4 shrink-0 transition ${isSelected ? 'text-black translate-x-0.5' : 'text-zinc-300'}`} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="space-y-3.5 max-w-md w-full mx-auto pb-4">
-      {/* ======================================================== */}
-      {/* SELETOR DE MODO DE ROTA (MOBILE FIRST)                   */}
-      {/* ======================================================== */}
-      <div className="bg-white rounded-3xl border border-zinc-200 p-3 shadow-xs space-y-2">
+    <div className="w-full pb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
+        {/* Coluna Lateral Esquerda no Desktop (Sticky) */}
+        <div className="lg:col-span-5 xl:col-span-4 space-y-3.5 lg:sticky lg:top-20">
+          {/* ======================================================== */}
+          {/* SELETOR DE MODO DE ROTA (MOBILE FIRST & DESKTOP)         */}
+          {/* ======================================================== */}
+          <div className="bg-white rounded-3xl border border-zinc-200 p-3 shadow-xs space-y-2">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-1.5">
             <Compass className="w-3.5 h-3.5 text-black" />
@@ -330,6 +414,14 @@ export const RouteView: React.FC<RouteViewProps> = ({
         )}
       </div>
 
+      {/* Lista Completa das Paradas na Coluna Esquerda no Desktop */}
+      <div className="hidden lg:block">
+        {renderRouteStopsList()}
+      </div>
+    </div>
+
+    {/* Coluna Direita no Desktop: Detalhe do Lead Ativo & Ações */}
+    <div className="lg:col-span-7 xl:col-span-8 space-y-3.5">
       {/* ======================================================== */}
       {/* CONTROLES DE NAVEGAÇÃO DE PARADA ANTERIOR / PRÓXIMA     */}
       {/* ======================================================== */}
@@ -414,24 +506,49 @@ export const RouteView: React.FC<RouteViewProps> = ({
           </div>
         )}
 
-        {/* Quem Procurar */}
-        <div className="p-3.5 rounded-2xl bg-zinc-100 border border-zinc-200">
-          <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
-            QUEM PROCURAR NO LOCAL
+        {/* Subgrid Responsivo: Quem Procurar + Janela Ideal */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Quem Procurar */}
+          <div className="p-3.5 rounded-2xl bg-zinc-100 border border-zinc-200 flex flex-col justify-between">
+            <div>
+              <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
+                QUEM PROCURAR NO LOCAL
+              </div>
+              <div className="text-lg font-black text-black mt-0.5 tracking-tight truncate">
+                {activeLead.targetContact}
+              </div>
+            </div>
+            <p className="text-xs text-zinc-600 mt-2 leading-relaxed">
+              {activeLead.bestTimeNote}
+            </p>
           </div>
-          <div className="text-lg font-black text-black mt-0.5 tracking-tight">
-            {activeLead.targetContact}
+
+          {/* Melhor Horário & Status da Janela */}
+          <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
+                  JANELA IDEAL INFORMADA
+                </span>
+                <span className={`text-[10px] px-2 py-0.5 rounded border ${timeCheck.badgeClass}`}>
+                  {timeCheck.badgeText}
+                </span>
+              </div>
+              <div className="text-base font-black text-black">
+                {activeLead.bestTime}
+              </div>
+            </div>
+            <p className="text-xs text-zinc-600 mt-2">
+              {timeCheck.description}
+            </p>
           </div>
-          <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
-            {activeLead.bestTimeNote}
-          </p>
         </div>
 
         {/* Histórico WhatsApp / Contato Prévio com balão no estilo WhatsApp */}
         {activeLead.contactHistory && (
           <div
             style={{ backgroundColor: WHATSAPP_PALETTE.bg }}
-            className="p-3 rounded-2xl border border-emerald-200/60 text-xs space-y-1.5"
+            className="p-3.5 rounded-2xl border border-emerald-200/60 text-xs space-y-1.5"
           >
             <div className="flex items-center justify-between">
               <span
@@ -456,24 +573,6 @@ export const RouteView: React.FC<RouteViewProps> = ({
             </div>
           </div>
         )}
-
-        {/* Melhor Horário & Status da Janela */}
-        <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
-              JANELA IDEAL INFORMADA
-            </span>
-            <span className={`text-[10px] px-2 py-0.5 rounded border ${timeCheck.badgeClass}`}>
-              {timeCheck.badgeText}
-            </span>
-          </div>
-          <div className="text-base font-black text-black">
-            {activeLead.bestTime}
-          </div>
-          <p className="text-xs text-zinc-600 mt-0.5">
-            {timeCheck.description}
-          </p>
-        </div>
 
         {/* Endereço & Distância do Ponto de Partida */}
         <div className="text-xs text-zinc-700 bg-zinc-50 p-3 rounded-2xl border border-zinc-200 space-y-2">
@@ -559,7 +658,7 @@ export const RouteView: React.FC<RouteViewProps> = ({
         {/* ======================================================== */}
         {/* BOTÕES DE AÇÃO RÁPIDA (MIN 52PX PARA TOQUE ERGONÔMICO)   */}
         {/* ======================================================== */}
-        <div className="pt-2 grid grid-cols-2 gap-2.5">
+        <div className="pt-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {/* Navegar saindo da São Benedito 1474 / Atual */}
           <a
             href={googleMapsWalkingUrl}
@@ -614,85 +713,9 @@ export const RouteView: React.FC<RouteViewProps> = ({
         </button>
       </div>
 
-      {/* ======================================================== */}
-      {/* LISTA COMPLETA DOS LEADS DO MODO SELECIONADO             */}
-      {/* ======================================================== */}
-      <div className="pt-2 space-y-2">
-        <div className="flex items-center justify-between text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-500 px-1">
-          <span>ORDEM DESTE ROTEIRO ({leads.length} LOCAIS)</span>
-          <span>{currentModeConfig.shortName}</span>
-        </div>
-
-        <div className="divide-y divide-zinc-200 rounded-3xl border border-zinc-200 bg-white overflow-hidden shadow-xs">
-          {leads.map((lead) => {
-            const isSelected = lead.id === activeLead.id;
-            const status = leadStatuses[lead.id];
-            const isDone = status === 'scheduled' || status === 'visited' || status === 'in_progress';
-
-            return (
-              <div
-                key={lead.id}
-                onClick={() => onSelectLead(lead.id)}
-                className={`p-3.5 cursor-pointer transition flex items-center justify-between gap-3 active:bg-zinc-100 ${
-                  isSelected ? 'bg-zinc-100 border-l-4 border-black' : 'hover:bg-zinc-50'
-                }`}
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div
-                    className={`w-7 h-7 rounded-lg text-xs font-mono font-bold flex items-center justify-center shrink-0 ${
-                      isDone
-                        ? 'bg-black text-white'
-                        : isSelected
-                        ? 'bg-black text-white ring-2 ring-zinc-400'
-                        : 'bg-zinc-100 text-zinc-700 border border-zinc-300'
-                    }`}
-                  >
-                    {isDone ? '✓' : lead.order}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1">
-                      <h4 className="font-bold text-sm text-black truncate leading-tight">
-                        {lead.name}
-                      </h4>
-                      {lead.suggestedTimeSlot && (
-                        <span className="text-[10px] font-mono font-bold text-zinc-700 bg-zinc-100 px-1.5 py-0.5 rounded border border-zinc-200 shrink-0">
-                          {lead.suggestedTimeSlot}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-[11px] text-zinc-600 mt-0.5 truncate">
-                      <span>👤 {lead.targetContact}</span>
-                      <span>•</span>
-                      <span className="font-mono">{lead.walkingFromPrev.distance}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-                  <a
-                    href={getWhatsAppUrl(lead)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ backgroundColor: WHATSAPP_PALETTE.bubble, color: WHATSAPP_PALETTE.darkTeal }}
-                    className="p-1.5 rounded-lg border border-emerald-300/60 hover:opacity-90 transition active:scale-90 flex items-center justify-center shadow-2xs"
-                    title="Conversar no WhatsApp"
-                  >
-                    <WhatsAppIcon size={14} fill={WHATSAPP_PALETTE.darkTeal} />
-                  </a>
-                  <button
-                    onClick={() => onOpenAiCoach(lead)}
-                    className="p-1.5 rounded-lg border border-zinc-200 hover:bg-zinc-100 text-zinc-600 hover:text-black transition active:scale-90"
-                    title="Perguntar à IA OpenRouter"
-                  >
-                    <Bot className="w-3.5 h-3.5" />
-                  </button>
-                  <ChevronRight className={`w-4 h-4 shrink-0 transition ${isSelected ? 'text-black translate-x-0.5' : 'text-zinc-300'}`} />
-                </div>
-              </div>
-            );
-          })}
+        {/* No mobile (< lg), a lista completa fica abaixo do card da parada atual */}
+        <div className="block lg:hidden pt-2">
+          {renderRouteStopsList()}
         </div>
       </div>
     </div>

@@ -55,9 +55,16 @@ export const MapView: React.FC<MapViewProps> = ({
       const markersGroup = L.layerGroup().addTo(map);
       markersLayerRef.current = markersGroup;
       mapInstanceRef.current = map;
+
+      const handleResize = () => {
+        map.invalidateSize();
+      };
+      window.addEventListener('resize', handleResize);
+      setTimeout(handleResize, 200);
     }
 
     return () => {
+      window.removeEventListener('resize', () => {});
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -328,13 +335,13 @@ export const MapView: React.FC<MapViewProps> = ({
   };
 
   return (
-    <div className="space-y-2 max-w-md mx-auto">
+    <div className="space-y-3 w-full">
       {/* Botões de Ação de Mapa no Topo (Monocromáticos e fáceis de tocar) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
         <button
           onClick={handleLocateUser}
           disabled={isLocating}
-          className={`h-11 px-3.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95 ${
+          className={`h-11 px-3.5 sm:px-4 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95 ${
             userLocation ? 'bg-black text-white border-black' : 'bg-white text-black border-zinc-300 hover:bg-zinc-100'
           }`}
         >
@@ -344,7 +351,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
         <button
           onClick={handleFitEntireRoute}
-          className="h-11 px-3.5 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-black text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95"
+          className="h-11 px-3.5 sm:px-4 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-black text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95"
         >
           <Navigation className="w-4 h-4" />
           <span>Rota Toda</span>
@@ -352,7 +359,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
         <button
           onClick={() => setShowMetro(!showMetro)}
-          className={`h-11 px-3.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95 ${
+          className={`h-11 px-3.5 sm:px-4 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95 ${
             showMetro ? 'bg-black text-white border-black' : 'bg-white text-black border-zinc-300 hover:bg-zinc-100'
           }`}
         >
@@ -362,7 +369,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
         <button
           onClick={() => setShowNearby(!showNearby)}
-          className={`h-11 px-3.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95 ${
+          className={`h-11 px-3.5 sm:px-4 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 whitespace-nowrap transition active:scale-95 ${
             showNearby ? 'bg-black text-white border-black' : 'bg-white text-black border-zinc-300 hover:bg-zinc-100'
           }`}
         >
@@ -371,8 +378,8 @@ export const MapView: React.FC<MapViewProps> = ({
         </button>
       </div>
 
-      {/* Contêiner Leaflet com Classe monochrome-map */}
-      <div className="relative w-full h-[360px] sm:h-[420px] rounded-3xl overflow-hidden border-2 border-black monochrome-map shadow-sm">
+      {/* Contêiner Leaflet Responsivo com Altura Adaptativa */}
+      <div className="relative w-full h-[380px] sm:h-[460px] md:h-[540px] lg:h-[620px] rounded-3xl overflow-hidden border-2 border-black monochrome-map shadow-sm">
         <div ref={mapContainerRef} className="w-full h-full z-0" />
 
         {locationError && (
@@ -382,8 +389,8 @@ export const MapView: React.FC<MapViewProps> = ({
         )}
       </div>
 
-      {/* Legenda Monocromática */}
-      <div className="p-3 bg-white rounded-2xl border border-zinc-200 text-[11px] font-mono flex items-center justify-between text-zinc-600">
+      {/* Legenda Monocromática Responsiva */}
+      <div className="p-3 sm:p-4 bg-white rounded-2xl border border-zinc-200 text-[11px] font-mono flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-zinc-600">
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1 text-black font-bold">
             <span className="w-3.5 h-3.5 rounded-full bg-black text-white text-[8px] flex items-center justify-center">1</span>
@@ -391,10 +398,10 @@ export const MapView: React.FC<MapViewProps> = ({
           </span>
           <span className="flex items-center gap-1">
             <span className="w-3.5 h-3.5 rounded-md bg-zinc-700 text-white text-[8px] flex items-center justify-center">M</span>
-            Metrô L5
+            Metrô L5 Lilás
           </span>
         </div>
-        <span className="text-zinc-500">Total: ~18,5 km</span>
+        <span className="text-zinc-500 font-bold">Extensão total do roteiro: ~18,5 km</span>
       </div>
     </div>
   );

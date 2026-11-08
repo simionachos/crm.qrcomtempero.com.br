@@ -140,8 +140,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-black flex flex-col font-sans selection:bg-black selection:text-white pb-24">
-      {/* Navbar Superior Minimalista Monocromática */}
+    <div className="min-h-screen bg-zinc-50 text-black flex flex-col font-sans selection:bg-black selection:text-white pb-24 md:pb-12">
+      {/* Navbar Superior Minimalista Monocromática com Abas Desktop */}
       <Navbar
         completedCount={completedCount}
         totalCount={currentLeads.length}
@@ -154,46 +154,50 @@ export default function App() {
         user={currentUser}
         onOpenSecurity={() => setIsSecurityOpen(true)}
         onLogout={handleLogout}
+        activeTab={activeTab}
+        onChangeTab={setActiveTab}
       />
 
-      {/* Conteúdo Principal Mobile First */}
-      <main className="flex-1 max-w-md w-full mx-auto px-3.5 pt-3.5 space-y-3.5">
-        {/* Banner de Partida Minimalista */}
-        <div className="bg-white rounded-3xl border border-zinc-200 p-4 shadow-xs space-y-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
-              PONTO DE PARTIDA FIXO
-            </span>
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STARTING_POINT.address)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] font-mono font-bold text-black flex items-center gap-1 hover:underline"
-            >
-              <MapPin className="w-3 h-3" />
-              <span>Abrir no GPS</span>
-            </a>
+      {/* Conteúdo Principal Responsivo (Mobile First até Telas Ultra-Wide) */}
+      <main className="flex-1 w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 pt-3.5 sm:pt-6 space-y-4">
+        {/* Banner de Partida Minimalista e Responsivo */}
+        <div className="bg-white rounded-3xl border border-zinc-200 p-4 sm:p-5 shadow-xs space-y-3 md:space-y-0 md:flex md:items-center md:justify-between md:gap-6">
+          <div className="space-y-1.5 flex-1 min-w-0">
+            <div className="flex items-center justify-between md:justify-start md:gap-3">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
+                PONTO DE PARTIDA FIXO
+              </span>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STARTING_POINT.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[11px] font-mono font-bold text-black flex items-center gap-1 hover:underline"
+              >
+                <MapPin className="w-3 h-3" />
+                <span>Abrir no GPS</span>
+              </a>
+            </div>
+
+            <div>
+              <h2 className="text-base sm:text-lg font-black text-black leading-snug truncate">
+                {STARTING_POINT.address.split('–')[0]}
+              </h2>
+              <p className="text-xs text-zinc-500">
+                {ROUTE_MODE_CONFIGS[activeMode].departureNote}
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h2 className="text-base font-black text-black leading-snug">
-              {STARTING_POINT.address.split('–')[0]}
-            </h2>
-            <p className="text-xs text-zinc-500">
-              {ROUTE_MODE_CONFIGS[activeMode].departureNote}
-            </p>
-          </div>
-
-          <div className="pt-2 border-t border-zinc-100 grid grid-cols-3 gap-2 text-center text-xs font-mono">
-            <div className="bg-zinc-50 p-2 rounded-xl border border-zinc-200">
+          <div className="pt-2 md:pt-0 border-t md:border-t-0 md:border-l border-zinc-100 md:pl-6 grid grid-cols-3 gap-2 text-center text-xs font-mono shrink-0 md:min-w-[320px]">
+            <div className="bg-zinc-50 p-2 sm:p-2.5 rounded-xl border border-zinc-200">
               <span className="text-[10px] text-zinc-500 block">Horário</span>
               <strong className="text-black font-bold text-xs">{ROUTE_MODE_CONFIGS[activeMode].estimatedTime}</strong>
             </div>
-            <div className="bg-zinc-50 p-2 rounded-xl border border-zinc-200">
+            <div className="bg-zinc-50 p-2 sm:p-2.5 rounded-xl border border-zinc-200">
               <span className="text-[10px] text-zinc-500 block">Roteiro</span>
-              <strong className="text-black font-bold text-xs">{ROUTE_MODE_CONFIGS[activeMode].shortName.split(' ')[0]} {ROUTE_MODE_CONFIGS[activeMode].shortName.split(' ')[1] || ''}</strong>
+              <strong className="text-black font-bold text-xs truncate block">{ROUTE_MODE_CONFIGS[activeMode].shortName.split(' ')[0]} {ROUTE_MODE_CONFIGS[activeMode].shortName.split(' ')[1] || ''}</strong>
             </div>
-            <div className="bg-zinc-50 p-2 rounded-xl border border-zinc-200">
+            <div className="bg-zinc-50 p-2 sm:p-2.5 rounded-xl border border-zinc-200">
               <span className="text-[10px] text-zinc-500 block">Progresso</span>
               <strong className="text-black font-bold text-xs">{completedCount}/{currentLeads.length}</strong>
             </div>

@@ -19,7 +19,7 @@ export const MetroTipsView: React.FC = () => {
   const [showAllLines, setShowAllLines] = useState(false);
 
   return (
-    <div className="space-y-4 max-w-md mx-auto pb-6">
+    <div className="space-y-4 w-full pb-6">
       {/* ======================================================== */}
       {/* BANNER PRINCIPAL COM COR OFICIAL DA LINHA 5 - LILÁS     */}
       {/* (Hex Oficial Metrô SP: #9B3894)                         */}
@@ -101,77 +101,83 @@ export const MetroTipsView: React.FC = () => {
           </span>
         </div>
 
-        {/* Card 1: Moema ➔ Chácara Klabin */}
-        <div className="p-3.5 rounded-2xl border border-zinc-200 bg-zinc-50 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span
-                className="w-5 h-5 rounded-md text-white font-mono font-bold text-[11px] flex items-center justify-center shrink-0"
-                style={{ backgroundColor: '#9B3894' }}
-              >
-                5
-              </span>
-              <span className="font-bold text-sm text-black">
-                Moema ➔ Chácara Klabin
-              </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {/* Card 1: Moema ➔ Chácara Klabin */}
+          <div className="p-3.5 rounded-2xl border border-zinc-200 bg-zinc-50 space-y-2 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-5 h-5 rounded-md text-white font-mono font-bold text-[11px] flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: '#9B3894' }}
+                  >
+                    5
+                  </span>
+                  <span className="font-bold text-sm text-black">
+                    Moema ➔ Chácara Klabin
+                  </span>
+                </div>
+                <span className="text-xs font-mono font-black text-white px-2 py-0.5 rounded bg-black">
+                  -46 MIN
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-2">
+                <div className="p-2 rounded-xl bg-white border border-zinc-200">
+                  <span className="text-[10px] text-zinc-400 block uppercase">Caminhada a pé</span>
+                  <strong className="text-zinc-800 text-xs">~4,7 km (58 min)</strong>
+                  <span className="text-[10px] text-rose-600 block mt-0.5 font-sans">Perna desgastante</span>
+                </div>
+                <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <span className="text-[10px] text-emerald-700 block uppercase">Metrô Linha 5</span>
+                  <strong className="text-emerald-900 text-xs">6 estações (12 min)</strong>
+                  <span className="text-[10px] text-emerald-700 block mt-0.5 font-sans">Direto sem baldeação</span>
+                </div>
+              </div>
             </div>
-            <span className="text-xs font-mono font-black text-white px-2 py-0.5 rounded bg-black">
-              -46 MIN
-            </span>
+
+            <p className="text-[11px] text-zinc-600 leading-tight pt-2 border-t border-zinc-200/60 mt-2">
+              💡 <strong>Dica Pro:</strong> Ao sair do Koi Restaurante (Moema), caminhe 600m até a Estação Moema.
+              Desembarque na <strong>Chácara Klabin</strong>; o Villa Klabin (Parada 11) fica a apenas 350 metros da catraca!
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
-            <div className="p-2 rounded-xl bg-white border border-zinc-200">
-              <span className="text-[10px] text-zinc-400 block uppercase">Caminhada a pé</span>
-              <strong className="text-zinc-800 text-xs">~4,7 km (58 min)</strong>
-              <span className="text-[10px] text-rose-600 block mt-0.5 font-sans">Perna desgastante</span>
+          {/* Card 2: Campo Belo ➔ Eucaliptos */}
+          <div className="p-3.5 rounded-2xl border border-zinc-200 bg-zinc-50 space-y-2 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-5 h-5 rounded-md text-white font-mono font-bold text-[11px] flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: '#9B3894' }}
+                  >
+                    5
+                  </span>
+                  <span className="font-bold text-sm text-black">
+                    Campo Belo ➔ Eucaliptos
+                  </span>
+                </div>
+                <span className="text-xs font-mono font-black text-white px-2 py-0.5 rounded bg-black">
+                  -25 MIN
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-2">
+                <div className="p-2 rounded-xl bg-white border border-zinc-200">
+                  <span className="text-[10px] text-zinc-400 block uppercase">Caminhada a pé</span>
+                  <strong className="text-zinc-800 text-xs">~2,6 km (33 min)</strong>
+                </div>
+                <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <span className="text-[10px] text-emerald-700 block uppercase">Metrô Linha 5</span>
+                  <strong className="text-emerald-900 text-xs">2 estações (5 min)</strong>
+                </div>
+              </div>
             </div>
-            <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200">
-              <span className="text-[10px] text-emerald-700 block uppercase">Metrô Linha 5</span>
-              <strong className="text-emerald-900 text-xs">6 estações (12 min)</strong>
-              <span className="text-[10px] text-emerald-700 block mt-0.5 font-sans">Direto sem baldeação</span>
-            </div>
+
+            <p className="text-[11px] text-zinc-600 leading-tight pt-2 border-t border-zinc-200/60 mt-2">
+              Atravesse a divisa entre Campo Belo e Vila Olímpia (Comino) rapidamente pelo metrô, poupando energia e tempo antes das 11h.
+            </p>
           </div>
-
-          <p className="text-[11px] text-zinc-600 leading-tight pt-0.5">
-            💡 <strong>Dica Pro:</strong> Ao sair do Koi Restaurante (Moema), caminhe 600m até a Estação Moema.
-            Desembarque na <strong>Chácara Klabin</strong>; o Villa Klabin (Parada 11) fica a apenas 350 metros da catraca!
-          </p>
-        </div>
-
-        {/* Card 2: Campo Belo ➔ Eucaliptos */}
-        <div className="p-3.5 rounded-2xl border border-zinc-200 bg-zinc-50 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span
-                className="w-5 h-5 rounded-md text-white font-mono font-bold text-[11px] flex items-center justify-center shrink-0"
-                style={{ backgroundColor: '#9B3894' }}
-              >
-                5
-              </span>
-              <span className="font-bold text-sm text-black">
-                Campo Belo ➔ Eucaliptos
-              </span>
-            </div>
-            <span className="text-xs font-mono font-black text-white px-2 py-0.5 rounded bg-black">
-              -25 MIN
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
-            <div className="p-2 rounded-xl bg-white border border-zinc-200">
-              <span className="text-[10px] text-zinc-400 block uppercase">Caminhada a pé</span>
-              <strong className="text-zinc-800 text-xs">~2,6 km (33 min)</strong>
-            </div>
-            <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200">
-              <span className="text-[10px] text-emerald-700 block uppercase">Metrô Linha 5</span>
-              <strong className="text-emerald-900 text-xs">2 estações (5 min)</strong>
-            </div>
-          </div>
-
-          <p className="text-[11px] text-zinc-600 leading-tight pt-0.5">
-            Atravesse a divisa entre Campo Belo e Vila Olímpia (Comino) rapidamente pelo metrô, poupando energia e tempo antes das 11h.
-          </p>
         </div>
       </div>
 
@@ -324,7 +330,7 @@ export const MetroTipsView: React.FC = () => {
               Cores padronizadas pelo Metrô de São Paulo e CPTM conforme a sinalização oficial das estações:
             </p>
 
-            <div className="grid grid-cols-1 gap-1.5 pt-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pt-1">
               {OFFICIAL_METRO_LINES.map((line) => (
                 <div
                   key={line.code}

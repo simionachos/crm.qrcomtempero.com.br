@@ -17,7 +17,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   totalCount
 }) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-[1500] bg-white border-t border-zinc-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[1500] bg-white border-t border-zinc-200/90 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-md mx-auto px-2 h-16 flex items-center justify-around">
         {/* Roteiro */}
         <button

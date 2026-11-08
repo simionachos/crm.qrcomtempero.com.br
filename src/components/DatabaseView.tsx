@@ -31,9 +31,9 @@ export const DatabaseView: React.FC = () => {
   }, [searchTerm, selectedNeighborhood, onlyPriority]);
 
   return (
-    <div className="space-y-4 max-w-md mx-auto">
-      {/* Busca Rápida Mobile */}
-      <div className="bg-white p-3.5 rounded-3xl border border-zinc-200 shadow-xs space-y-3">
+    <div className="space-y-4 w-full">
+      {/* Busca Rápida Mobile & Desktop */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-3xl border border-zinc-200 shadow-xs space-y-3">
         <div className="relative">
           <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
@@ -81,12 +81,12 @@ export const DatabaseView: React.FC = () => {
         )}
       </div>
 
-      {/* Cards de Leads Monocromáticos */}
-      <div className="space-y-2.5">
+      {/* Grid Responsivo de Cards de Leads: 1 Coluna (Mobile), 2 Colunas (Tablet), 3 Colunas (Desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
         {filteredLeads.map(lead => (
           <div
             key={lead.id}
-            className={`bg-white rounded-3xl p-4 border transition ${
+            className={`bg-white rounded-3xl p-4 sm:p-5 border flex flex-col justify-between transition shadow-xs hover:shadow-sm ${
               lead.isPriority ? 'border-2 border-black' : 'border-zinc-200'
             }`}
           >

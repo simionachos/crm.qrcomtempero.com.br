@@ -36,7 +36,7 @@ export const PitchModal: React.FC<PitchModalProps> = ({ lead, isOpen, onClose, o
 
   return (
     <div className="fixed inset-0 z-[2000] bg-black/70 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl border-2 border-black max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div className="bg-white w-full max-w-md sm:max-w-lg md:max-w-xl rounded-t-3xl sm:rounded-3xl border-2 border-black max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
         <div className="p-4 border-b border-zinc-200 flex items-center justify-between bg-black text-white">
           <div>
