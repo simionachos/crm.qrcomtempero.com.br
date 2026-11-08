@@ -7,6 +7,12 @@ export type VisitStatus =
   | 'not_interested' // Não tem interesse
   | 'visited';       // Visitado genérico
 
+export type RouteMode = 
+  | 'one_day_optimized'  // Opção A: 1 Dia Ajustado ao Relógio (Resolve os choques)
+  | 'two_days_day1'      // Opção B: Dia 1 (Santo Amaro & Brooklin)
+  | 'two_days_day2'      // Opção B: Dia 2 (Klabin, Moema & Vila Olímpia)
+  | 'linear_geo';        // Linear Geográfico Original
+
 export interface RouteLead {
   id: number;
   order: number;
@@ -18,6 +24,11 @@ export interface RouteLead {
   targetContact: string;
   bestTime: string;
   bestTimeNote: string;
+  suggestedTimeSlot?: string;
+  distanceFromStart?: string;
+  walkingTimeFromStart?: string;
+  conflictWarning?: string;
+  modeNote?: string;
   walkingFromPrev: {
     distance: string;
     duration: string;
@@ -80,12 +91,23 @@ export interface GeneralLead {
   isPriority?: boolean;
 }
 
+export interface MetroTransferLine {
+  code: string;
+  name: string;
+  color: string;
+  textColor?: string;
+}
+
 export interface MetroStation {
   id: string;
   name: string;
   line: string;
+  lineCode: string;
+  lineColor: string;
   lat: number;
   lng: number;
   nearbyStops: number[];
   tip: string;
+  transfers?: MetroTransferLine[];
+  address?: string;
 }

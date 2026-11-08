@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
-import { RouteLead, VisitLog } from '../types';
+import { RouteLead, VisitLog, RouteMode } from '../types';
+import { ROUTE_MODE_CONFIGS } from '../data/leadsData';
 import { X, Copy, Check, Share2 } from 'lucide-react';
+import { WhatsAppIcon, WHATSAPP_PALETTE } from './WhatsAppIcon';
 
 interface DailyReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   routeLeads: RouteLead[];
   visits: VisitLog[];
+  activeMode?: RouteMode;
 }
 
 export const DailyReportModal: React.FC<DailyReportModalProps> = ({
   isOpen,
   onClose,
   routeLeads,
-  visits
+  visits,
+  activeMode = 'one_day_optimized'
 }) => {
   if (!isOpen) return null;
 
   const [copied, setCopied] = useState(false);
+  const modeConfig = ROUTE_MODE_CONFIGS[activeMode];
 
   const completedVisits = visits.length;
   const scheduledCount = visits.filter(v => v.status === 'scheduled').length;
@@ -35,9 +40,10 @@ export const DailyReportModal: React.FC<DailyReportModalProps> = ({
   const generateReportText = () => {
     let report = `RELATÓRIO DIÁRIO DE PROSPECÇÃO (SDR)\n`;
     report += `Data: ${todayStr}\n`;
-    report += `Rota: Santo Amaro ➔ Vila Mariana (~18,5 km)\n\n`;
+    report += `Roteiro: ${modeConfig?.name || 'Prospecção SP'} (${routeLeads.length} paradas)\n`;
+    report += `Partida: Rua São Benedito, 1474 – Santo Amaro\n\n`;
     report += `RESUMO:\n`;
-    report += `• Visitas Realizadas: ${completedVisits} de 11\n`;
+    report += `• Visitas Realizadas: ${completedVisits} de ${routeLeads.length}\n`;
     report += `• Reuniões Agendadas: ${scheduledCount}\n`;
     report += `• Decisores em Negociação: ${inProgressCount}\n`;
     report += `• Retornos / Follow-ups: ${returnLaterCount}\n`;
@@ -125,8 +131,12 @@ export const DailyReportModal: React.FC<DailyReportModalProps> = ({
           {/* Pré-visualização do Relatório */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500">
-                TEXTO FORMATADO (WHATSAPP/CRM)
+              <span
+                style={{ backgroundColor: WHATSAPP_PALETTE.bubble, color: WHATSAPP_PALETTE.darkTeal }}
+                className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md flex items-center gap-1 border border-emerald-300/50"
+              >
+                <WhatsAppIcon size={12} fill={WHATSAPP_PALETTE.darkTeal} />
+                TEXTO FORMATADO WHATSAPP / CRM
               </span>
               <button
                 onClick={handleCopy}
@@ -154,9 +164,10 @@ export const DailyReportModal: React.FC<DailyReportModalProps> = ({
 
           <button
             onClick={handleShareWhatsApp}
-            className="flex-1 h-13 rounded-2xl bg-black hover:bg-zinc-800 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95"
+            style={{ backgroundColor: WHATSAPP_PALETTE.green }}
+            className="flex-1 h-13 rounded-2xl text-white font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 hover:opacity-90 shadow-sm"
           >
-            <Share2 className="w-4 h-4" />
+            <WhatsAppIcon size={18} fill="#FFFFFF" />
             <span>Enviar WhatsApp</span>
           </button>
         </div>

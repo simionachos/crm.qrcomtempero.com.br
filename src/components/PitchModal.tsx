@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { RouteLead } from '../types';
 import { audioTts } from '../utils/audioTts';
 import { X, Volume2, VolumeX, Copy, Check, Bot } from 'lucide-react';
+import { WhatsAppIcon, WHATSAPP_PALETTE } from './WhatsAppIcon';
 
 interface PitchModalProps {
   lead: RouteLead;
@@ -87,14 +88,64 @@ export const PitchModal: React.FC<PitchModalProps> = ({ lead, isOpen, onClose, o
           )}
 
           {/* Histórico Anterior */}
-          <div className="p-3 bg-zinc-100 rounded-2xl border border-zinc-200 text-xs">
-            <div className="text-[10px] font-mono font-bold uppercase text-zinc-500 mb-1">
-              HISTÓRICO DE CONTATO (COLUNA O)
+          {lead.contactHistory && (
+            <div
+              className={`p-3 rounded-2xl border text-xs space-y-1.5 ${
+                lead.contactHistory.toLowerCase().includes('whatsapp')
+                  ? 'border-emerald-300/60'
+                  : 'bg-zinc-100 border-zinc-200'
+              }`}
+              style={
+                lead.contactHistory.toLowerCase().includes('whatsapp')
+                  ? { backgroundColor: WHATSAPP_PALETTE.bg }
+                  : undefined
+              }
+            >
+              <div className="flex items-center justify-between">
+                <div
+                  className="text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1"
+                  style={
+                    lead.contactHistory.toLowerCase().includes('whatsapp')
+                      ? { color: WHATSAPP_PALETTE.darkTeal }
+                      : undefined
+                  }
+                >
+                  {lead.contactHistory.toLowerCase().includes('whatsapp') && (
+                    <WhatsAppIcon size={12} fill={WHATSAPP_PALETTE.darkTeal} />
+                  )}
+                  <span>HISTÓRICO DE CONTATO (COLUNA O)</span>
+                </div>
+
+                {lead.contactHistory.toLowerCase().includes('whatsapp') && (
+                  <a
+                    href={
+                      lead.whatsapp || lead.phone
+                        ? `https://wa.me/${(lead.whatsapp || lead.phone || '').replace(/[^0-9]/g, '')}`
+                        : 'https://wa.me/'
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ backgroundColor: WHATSAPP_PALETTE.green }}
+                    className="h-6 px-2 rounded-lg text-[10px] font-mono font-bold text-white flex items-center gap-1 shadow-2xs hover:opacity-90 transition active:scale-90"
+                  >
+                    <WhatsAppIcon size={11} fill="#FFFFFF" />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
+              </div>
+
+              <div
+                className="p-2.5 rounded-xl text-xs leading-relaxed font-medium"
+                style={
+                  lead.contactHistory.toLowerCase().includes('whatsapp')
+                    ? { backgroundColor: WHATSAPP_PALETTE.bubble, color: WHATSAPP_PALETTE.darkTeal }
+                    : undefined
+                }
+              >
+                <p className="whitespace-pre-wrap">{lead.contactHistory}</p>
+              </div>
             </div>
-            <p className="text-zinc-800 leading-relaxed font-medium">
-              {lead.contactHistory}
-            </p>
-          </div>
+          )}
 
           {/* Abordagem no Balcão */}
           <div className="p-3.5 bg-zinc-50 rounded-2xl border border-zinc-300 space-y-2">

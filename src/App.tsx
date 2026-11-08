@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { RouteLead, VisitLog, VisitStatus } from './types';
-import { ROUTE_LEADS, METRO_STATIONS, ALL_DATABASE_LEADS, STARTING_POINT } from './data/leadsData';
+import React, { useState, useEffect, useMemo } from 'react';
+import { RouteLead, VisitLog, VisitStatus, RouteMode } from './types';
+import {
+  ROUTE_LEADS,
+  METRO_STATIONS,
+  ALL_DATABASE_LEADS,
+  STARTING_POINT,
+  getRouteLeadsForMode,
+  ROUTE_MODE_CONFIGS
+} from './data/leadsData';
 import { getSavedVisits, saveVisit, getLeadStatuses, getActiveStopId, setActiveStopId } from './utils/storage';
 import { getStoredAuth, clearStoredAuth, verifySession, AuthUser } from './utils/auth';
 import { Navbar } from './components/Navbar';
@@ -21,8 +28,11 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
+  // Modo da rota: 1 Dia Otimizado (padrão que resolve conflitos), Dia 1, Dia 2 ou Linear Geográfico
+  const [activeMode, setActiveMode] = useState<RouteMode>('one_day_optimized');
+
   const [activeTab, setActiveTab] = useState<'route' | 'map' | 'metro' | 'database'>('route');
-  const [activeLeadId, setActiveLeadIdState] = useState<number>(1);
+  const [activeLeadId, setActiveLeadIdState] = useState<number>(2); // Começa na Padaria Santa Clara (09h00) no modo 1 dia
   const [leadStatuses, setLeadStatuses] = useState<Record<number, VisitStatus>>({});
   const [visits, setVisits] = useState<VisitLog[]>([]);
 
@@ -33,6 +43,11 @@ export default function App() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
   const [aiLeadContext, setAiLeadContext] = useState<RouteLead | undefined>(undefined);
+
+  // Leads dinâmicos de acordo com o modo da rota
+  const currentLeads = useMemo(() => {
+    return getRouteLeadsForMode(activeMode);
+  }, [activeMode]);
 
   // Inicialização e verificação de autenticação
   useEffect(() => {
@@ -56,7 +71,7 @@ export default function App() {
 
     setVisits(savedVisits);
     setLeadStatuses(savedStatuses);
-    if (savedActiveId && savedActiveId >= 1 && savedActiveId <= ROUTE_LEADS.length) {
+    if (savedActiveId && savedActiveId >= 1) {
       setActiveLeadIdState(savedActiveId);
     }
   }, []);
@@ -75,8 +90,17 @@ export default function App() {
     setActiveStopId(id);
   };
 
+  const handleModeChange = (newMode: RouteMode) => {
+    setActiveMode(newMode);
+    const newLeads = getRouteLeadsForMode(newMode);
+    if (newLeads.length > 0) {
+      setActiveLeadIdState(newLeads[0].id);
+      setActiveStopId(newLeads[0].id);
+    }
+  };
+
   const handleOpenAiCoach = (lead?: RouteLead) => {
-    const target = lead || ROUTE_LEADS.find(l => l.id === activeLeadId);
+    const target = lead || currentLeads.find(l => l.id === activeLeadId) || currentLeads[0];
     setAiLeadContext(target);
     setIsAiModalOpen(true);
   };
@@ -89,14 +113,15 @@ export default function App() {
       [visit.leadId]: visit.status
     }));
 
-    if (activeLeadId < ROUTE_LEADS.length) {
-      const nextId = activeLeadId + 1;
+    const currentIndex = currentLeads.findIndex(l => l.id === activeLeadId);
+    if (currentIndex >= 0 && currentIndex < currentLeads.length - 1) {
+      const nextId = currentLeads[currentIndex + 1].id;
       setActiveLeadIdState(nextId);
       setActiveStopId(nextId);
     }
   };
 
-  const completedCount = ROUTE_LEADS.filter(l => {
+  const completedCount = currentLeads.filter(l => {
     const st = leadStatuses[l.id];
     return st === 'scheduled' || st === 'visited' || st === 'in_progress';
   }).length;
@@ -119,11 +144,11 @@ export default function App() {
       {/* Navbar Superior Minimalista Monocromática */}
       <Navbar
         completedCount={completedCount}
-        totalCount={ROUTE_LEADS.length}
+        totalCount={currentLeads.length}
         onOpenReport={() => setIsReportOpen(true)}
         onOpenAiCoach={() => handleOpenAiCoach()}
         activeLeadId={activeLeadId}
-        routeLeads={ROUTE_LEADS}
+        routeLeads={currentLeads}
         leadStatuses={leadStatuses}
         onSelectLead={handleSelectLead}
         user={currentUser}
@@ -137,7 +162,7 @@ export default function App() {
         <div className="bg-white rounded-3xl border border-zinc-200 p-4 shadow-xs space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">
-              PONTO DE PARTIDA (ZONA SUL SP)
+              PONTO DE PARTIDA FIXO
             </span>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(STARTING_POINT.address)}`}
@@ -146,7 +171,7 @@ export default function App() {
               className="text-[11px] font-mono font-bold text-black flex items-center gap-1 hover:underline"
             >
               <MapPin className="w-3 h-3" />
-              <span>Abrir GPS</span>
+              <span>Abrir no GPS</span>
             </a>
           </div>
 
@@ -155,22 +180,22 @@ export default function App() {
               {STARTING_POINT.address.split('–')[0]}
             </h2>
             <p className="text-xs text-zinc-500">
-              Santo Amaro / Alto da Boa Vista ➔ Chácara Klabin
+              {ROUTE_MODE_CONFIGS[activeMode].departureNote}
             </p>
           </div>
 
           <div className="pt-2 border-t border-zinc-100 grid grid-cols-3 gap-2 text-center text-xs font-mono">
             <div className="bg-zinc-50 p-2 rounded-xl border border-zinc-200">
-              <span className="text-[10px] text-zinc-500 block">Distância</span>
-              <strong className="text-black font-bold text-xs">~18,5 km</strong>
+              <span className="text-[10px] text-zinc-500 block">Horário</span>
+              <strong className="text-black font-bold text-xs">{ROUTE_MODE_CONFIGS[activeMode].estimatedTime}</strong>
             </div>
             <div className="bg-zinc-50 p-2 rounded-xl border border-zinc-200">
-              <span className="text-[10px] text-zinc-500 block">Marcha</span>
-              <strong className="text-black font-bold text-xs">~3h45-4h15</strong>
+              <span className="text-[10px] text-zinc-500 block">Roteiro</span>
+              <strong className="text-black font-bold text-xs">{ROUTE_MODE_CONFIGS[activeMode].shortName.split(' ')[0]} {ROUTE_MODE_CONFIGS[activeMode].shortName.split(' ')[1] || ''}</strong>
             </div>
             <div className="bg-zinc-50 p-2 rounded-xl border border-zinc-200">
-              <span className="text-[10px] text-zinc-500 block">Feitos</span>
-              <strong className="text-black font-bold text-xs">{completedCount}/11</strong>
+              <span className="text-[10px] text-zinc-500 block">Progresso</span>
+              <strong className="text-black font-bold text-xs">{completedCount}/{currentLeads.length}</strong>
             </div>
           </div>
         </div>
@@ -178,7 +203,7 @@ export default function App() {
         {/* Abas */}
         {activeTab === 'route' && (
           <RouteView
-            leads={ROUTE_LEADS}
+            leads={currentLeads}
             activeLeadId={activeLeadId}
             onSelectLead={handleSelectLead}
             leadStatuses={leadStatuses}
@@ -186,12 +211,14 @@ export default function App() {
             onOpenCheckIn={(lead) => setCheckInLead(lead)}
             onOpenPitch={(lead) => setPitchLead(lead)}
             onOpenAiCoach={(lead) => handleOpenAiCoach(lead)}
+            activeMode={activeMode}
+            onChangeMode={handleModeChange}
           />
         )}
 
         {activeTab === 'map' && (
           <MapView
-            routeLeads={ROUTE_LEADS}
+            routeLeads={currentLeads}
             activeLeadId={activeLeadId}
             onSelectLead={handleSelectLead}
             leadStatuses={leadStatuses}
@@ -211,7 +238,7 @@ export default function App() {
         onChangeTab={setActiveTab}
         onOpenReport={() => setIsReportOpen(true)}
         completedCount={completedCount}
-        totalCount={ROUTE_LEADS.length}
+        totalCount={currentLeads.length}
       />
 
       {/* Modais */}
@@ -238,8 +265,9 @@ export default function App() {
         <DailyReportModal
           isOpen={isReportOpen}
           onClose={() => setIsReportOpen(false)}
-          routeLeads={ROUTE_LEADS}
+          routeLeads={currentLeads}
           visits={visits}
+          activeMode={activeMode}
         />
       )}
 

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ALL_DATABASE_LEADS } from '../data/leadsData';
 import { Search, MapPin, Phone, MessageSquare, ExternalLink, Star } from 'lucide-react';
+import { WhatsAppIcon, WHATSAPP_PALETTE } from './WhatsAppIcon';
 
 export const DatabaseView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -122,7 +123,24 @@ export const DatabaseView: React.FC = () => {
             )}
 
             {lead.notes && (
-              <div className="text-[11px] text-black mt-2 p-2 bg-zinc-100 rounded-xl border border-zinc-200 font-medium">
+              <div
+                className={`text-[11px] mt-2 p-2 rounded-xl border font-medium ${
+                  lead.notes.toLowerCase().includes('whatsapp')
+                    ? 'border-emerald-300/60'
+                    : 'bg-zinc-100 text-black border-zinc-200'
+                }`}
+                style={
+                  lead.notes.toLowerCase().includes('whatsapp')
+                    ? { backgroundColor: WHATSAPP_PALETTE.bubble, color: WHATSAPP_PALETTE.darkTeal }
+                    : undefined
+                }
+              >
+                {lead.notes.toLowerCase().includes('whatsapp') && (
+                  <span className="inline-flex items-center gap-1 font-bold font-mono text-[9px] uppercase mr-1.5 opacity-90">
+                    <WhatsAppIcon size={11} fill={WHATSAPP_PALETTE.darkTeal} />
+                    ZAP:
+                  </span>
+                )}
                 {lead.notes}
               </div>
             )}
@@ -144,10 +162,11 @@ export const DatabaseView: React.FC = () => {
                     href={`https://wa.me/${lead.whatsapp.replace(/[^0-9]/g, '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="h-9 px-3 rounded-xl bg-black text-white text-xs font-mono font-bold flex items-center gap-1 transition active:scale-90"
+                    style={{ backgroundColor: WHATSAPP_PALETTE.green }}
+                    className="h-9 px-3 rounded-xl text-white text-xs font-mono font-bold flex items-center gap-1.5 transition active:scale-90 hover:opacity-90 shadow-2xs"
                   >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Zap</span>
+                    <WhatsAppIcon size={14} fill="#FFFFFF" />
+                    <span>WhatsApp</span>
                   </a>
                 )}
               </div>

@@ -188,14 +188,15 @@ export const MapView: React.FC<MapViewProps> = ({
       markersGroup.addLayer(marker);
     });
 
-    // 4. Marcadores do Metrô
+    // 4. Marcadores do Metrô (Cores Oficiais Metrô SP: Linha 5 Lilás #9B3894 e Linha 2 Verde #008060)
     if (showMetro) {
       metroStations.forEach(station => {
+        const isTransfer = Boolean(station.transfers && station.transfers.length > 0);
         const metroIcon = L.divIcon({
           className: 'metro-station-marker',
           html: `
-            <div class="flex items-center justify-center w-7 h-7 rounded-md bg-zinc-700 text-white shadow-sm border border-white font-mono font-bold text-[10px]" title="${station.name}">
-              M
+            <div style="background-color: ${station.lineColor || '#9B3894'};" class="flex items-center justify-center w-7 h-7 rounded-lg text-white shadow-md border-2 border-white font-mono font-black text-xs" title="${station.name}">
+              ${station.lineCode || '5'}
             </div>
           `,
           iconSize: [28, 28],
@@ -204,11 +205,16 @@ export const MapView: React.FC<MapViewProps> = ({
         });
 
         const metroMarker = L.marker([station.lat, station.lng], { icon: metroIcon });
+        const transfersHtml = station.transfers?.map(t => `<span style="background-color: ${t.color}; color: ${t.textColor || '#fff'};" class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold">${t.name}</span>`).join(' ') || '';
+
         metroMarker.bindPopup(`
-          <div class="p-2 text-black font-sans min-w-[200px]">
-            <div class="text-[10px] font-mono font-bold text-zinc-500 uppercase">METRÔ LINHA 5 - LILÁS</div>
-            <div class="font-bold text-sm text-black mt-0.5">${station.name}</div>
-            <p class="text-xs text-zinc-600 mt-1 bg-zinc-100 p-2 rounded-lg border border-zinc-200">${station.tip}</p>
+          <div class="p-2 text-black font-sans min-w-[210px]">
+            <div class="flex items-center gap-1.5 mb-1">
+              <span style="background-color: #9B3894;" class="text-white text-[10px] font-mono font-bold px-1.5 py-0.5 rounded">L5 LILÁS</span>
+              ${transfersHtml}
+            </div>
+            <div class="font-bold text-sm text-black">${station.name}</div>
+            <p class="text-xs text-zinc-600 mt-1 bg-zinc-50 p-2 rounded-lg border border-zinc-200">${station.tip}</p>
           </div>
         `);
         markersGroup.addLayer(metroMarker);

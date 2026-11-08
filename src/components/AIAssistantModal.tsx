@@ -22,6 +22,7 @@ import {
   Zap,
   ArrowRight
 } from 'lucide-react';
+import { WhatsAppIcon, WHATSAPP_PALETTE } from './WhatsAppIcon';
 
 interface AIAssistantModalProps {
   lead?: RouteLead;
@@ -288,16 +289,29 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
 
         {/* Pílulas de Perguntas Rápidas */}
         <div className="px-3 py-1.5 border-t border-zinc-100 bg-zinc-50 shrink-0 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          {quickPrompts.map((prompt, i) => (
-            <button
-              key={i}
-              onClick={() => handleSendMessage(prompt)}
-              disabled={isLoading}
-              className="h-8 px-2.5 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-100 text-[11px] font-medium text-zinc-800 whitespace-nowrap transition active:scale-95 disabled:opacity-50"
-            >
-              {prompt}
-            </button>
-          ))}
+          {quickPrompts.map((prompt, i) => {
+            const isWhatsApp = prompt.includes('WhatsApp');
+            return (
+              <button
+                key={i}
+                onClick={() => handleSendMessage(prompt)}
+                disabled={isLoading}
+                style={
+                  isWhatsApp
+                    ? { backgroundColor: WHATSAPP_PALETTE.bubble, color: WHATSAPP_PALETTE.darkTeal, borderColor: '#a7f3d0' }
+                    : undefined
+                }
+                className={`h-8 px-2.5 rounded-lg border text-[11px] font-medium whitespace-nowrap transition active:scale-95 disabled:opacity-50 flex items-center gap-1 shrink-0 ${
+                  isWhatsApp
+                    ? 'font-bold shadow-2xs hover:opacity-90'
+                    : 'border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-800'
+                }`}
+              >
+                {isWhatsApp && <WhatsAppIcon size={12} fill={WHATSAPP_PALETTE.darkTeal} />}
+                <span>{prompt}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Campo de Envio Touch Friendly */}
